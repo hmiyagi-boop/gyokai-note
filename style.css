@@ -166,6 +166,10 @@ input, select {
 .btn-secondary { background: var(--surface); color: var(--accent); border: 1px solid var(--accent); margin-left: 8px; }
 .quiz-start label { max-width: 260px; margin: 12px 0; }
 .quiz-progress { display: flex; flex-wrap: wrap; align-items: center; gap: 8px; color: var(--muted); font-size: 0.85rem; margin-bottom: 8px; }
+.quiz-desc { margin-top: 8px; padding: 10px 12px; background: var(--bg); border-left: 3px solid var(--accent); border-radius: 4px; font-weight: normal; }
+.explain strong { color: var(--accent); }
+.chosen-note { margin-top: 8px; padding-top: 8px; border-top: 1px dashed var(--border); color: var(--muted); }
+.term-detail { color: var(--muted); font-size: 0.9rem; margin-top: 4px; }
 .mark-good { color: var(--good); font-weight: bold; }
 .mark-bad { color: var(--bad); font-weight: bold; }
 .link-btn { background: none; border: none; padding: 0; color: var(--accent); font: inherit; cursor: pointer; text-align: left; }

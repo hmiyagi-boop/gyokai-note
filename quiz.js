@@ -53,6 +53,20 @@ const ALL_TERMS = uniqueBy(INDUSTRIES.flatMap((ind) => ind.keyTerms.map((t) => (
 const ALL_KPIS = uniqueBy(INDUSTRIES.flatMap((ind) => ind.kpis.map((k) => ({ ...k, ind }))), "name");
 const ALL_REGS = uniqueBy(INDUSTRIES.flatMap((ind) => ind.regulations.map((r) => ({ ...r, ind }))), "name");
 
+// 用語の名前を答える問題の文章（説明文を見せて、当てはまる用語を選ばせる）
+function describeQuestion(label, description) {
+  return `次の説明に当てはまる${label}はどれ？<div class="quiz-desc">${description}</div>`;
+}
+
+// 用語名 → 意味の辞書。間違えたとき「選んだ用語の意味」を解説に出すのに使う
+const TERM_INDEX = Object.fromEntries([
+  ...FINANCE_TERMS.map((t) => [t.term, t.meaning]),
+  ...FRAMEWORKS.map((t) => [t.term, t.meaning]),
+  ...ALL_TERMS.map((t) => [t.term, t.meaning]),
+  ...ALL_KPIS.map((k) => [k.name, k.meaning]),
+  ...ALL_REGS.map((r) => [r.name, r.meaning])
+]);
+
 // 正解1つ＋他の候補から3つを選んで4択にする
 function fourChoices(answer, pool) {
   const others = shuffle([...new Set(pool)].filter((x) => x !== answer)).slice(0, 3);
@@ -193,7 +207,7 @@ const questionMakers = [
     make: (ind) => {
       const kpi = pick(ind.kpis);
       return {
-        question: `${ind.name}で使われる『${kpi.meaning}』を表すKPIは？`,
+        question: describeQuestion(`${ind.name}のKPI（経営指標）`, kpi.meaning),
         choices: fourChoices(kpi.name, ALL_KPIS.map((k) => k.name)),
         answer: kpi.name,
         explain: `${kpi.name}：${kpi.meaning}。お客様のKPIを知っていると、ヒアリングで数字の話ができます。`
@@ -205,7 +219,7 @@ const questionMakers = [
     make: (ind) => {
       const reg = pick(ind.regulations);
       return {
-        question: `${ind.name}に関わる『${reg.meaning}』はどれ？`,
+        question: describeQuestion(`${ind.name}に関わる法律・制度`, reg.meaning),
         choices: fourChoices(reg.name, ALL_REGS.map((r) => r.name)),
         answer: reg.name,
         explain: `${reg.name}：${reg.meaning}`
@@ -217,7 +231,7 @@ const questionMakers = [
     make: (ind) => {
       const t = pick(ind.keyTerms);
       return {
-        question: `${ind.name}でよく使う『${t.meaning}』を表す用語は？`,
+        question: describeQuestion(`${ind.name}でよく使う用語`, t.meaning),
         choices: fourChoices(t.term, ALL_TERMS.map((x) => x.term)),
         answer: t.term,
         explain: `${t.term}：${t.meaning}`
@@ -247,10 +261,10 @@ const questionMakers = [
     make: () => {
       const t = pick(FINANCE_TERMS);
       return {
-        question: `『${t.meaning}』を表す言葉は？`,
+        question: describeQuestion("財務・会計の用語", t.meaning),
         choices: fourChoices(t.term, FINANCE_TERMS.map((x) => x.term)),
         answer: t.term,
-        explain: `${t.term}：${t.meaning}`
+        explain: `${t.term}：${t.meaning}${financeGuide(t.term)}`
       };
     }
   },
@@ -285,7 +299,7 @@ const questionMakers = [
       return {
         question: `売上${sales}億円、営業利益${formatMan(profit * 10000)}の会社。営業利益率は？`,
         choices, answer,
-        explain: `営業利益率 = 営業利益 ÷ 売上 = ${formatMan(profit * 10000)} ÷ ${sales}億円 = ${rate}%`
+        explain: `営業利益率 = 営業利益 ÷ 売上 = ${formatMan(profit * 10000)} ÷ ${sales}億円 = ${rate}%${financeGuide("営業利益")}`
       };
     }
   },
@@ -299,7 +313,7 @@ const questionMakers = [
       return {
         question: `固定費が年${formatMan(fixed)}、変動費率が${variableRate}%の会社。損益分岐点の売上高は？`,
         choices, answer,
-        explain: `損益分岐点売上高 = 固定費 ÷（1 − 変動費率）= ${formatMan(fixed)} ÷ ${(100 - variableRate) / 100} = ${formatMan(bep)}。売上1円あたり${100 - variableRate}銭が固定費の回収に回る。`
+        explain: `損益分岐点売上高 = 固定費 ÷（1 − 変動費率）= ${formatMan(fixed)} ÷ ${(100 - variableRate) / 100} = ${formatMan(bep)}。売上1円あたり${100 - variableRate}銭が固定費の回収に回る。${financeGuide("損益分岐点")}`
       };
     }
   },
@@ -328,7 +342,7 @@ const questionMakers = [
       return {
         question: `自己資本${equity}億円、当期純利益${formatMan(net * 10000)}の会社。ROEは？`,
         choices, answer,
-        explain: `ROE = 当期純利益 ÷ 自己資本 = ${formatMan(net * 10000)} ÷ ${equity}億円 = ${roe}%。日本では8%が一つの目安とされる。`
+        explain: `ROE = 当期純利益 ÷ 自己資本 = ${formatMan(net * 10000)} ÷ ${equity}億円 = ${roe}%${financeGuide("ROE")}`
       };
     }
   }
@@ -468,7 +482,8 @@ function renderResult() {
           <span class="${r.correct ? "mark-good" : "mark-bad"}">${r.correct ? "○ 正解" : "× 不正解"}</span></div>
         <div class="quiz-q">${r.question}</div>
         <p>あなたの回答：<strong>${r.chosen}</strong>${r.correct ? "" : ` ／ 正解：<strong>${r.answer}</strong>`}</p>
-        <div class="explain"><strong>解説</strong> ${r.explain}</div>
+        <div class="explain"><strong>解説</strong> ${r.explain}
+          ${!r.correct && TERM_INDEX[r.chosen] ? `<div class="chosen-note">あなたが選んだ「${r.chosen}」は：${TERM_INDEX[r.chosen]}</div>` : ""}</div>
         ${r.industryId ? `<button class="link-btn" data-industry="${r.industryId}">${r.industry}を図鑑で復習する →</button>` : ""}
       </div>
     `).join("")}
