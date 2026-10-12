@@ -165,8 +165,10 @@ const questionMakers = [
   },
   {
     category: "業界知識", type: "経営課題", industry: true,
+    // トーク例（切り出しの一言）は問題にはせず、解説でだけ紹介する
     make: (ind) => {
       const chain = pick(ind.issueChains);
+      const talk = `<br>トーク例：${chain.hook}`;
       if (Math.random() < 0.5) {
         // 原因から、経営への影響を選ぶ
         const others = INDUSTRIES.filter((i) => i !== ind).map((i) => i.issueChains.find((c) => c.theme === chain.theme).impact);
@@ -174,7 +176,7 @@ const questionMakers = [
           question: `${ind.name}では「${chain.cause}」。経営への影響として最も当てはまるのは？`,
           choices: fourChoices(chain.impact, others),
           answer: chain.impact,
-          explain: `【${chain.theme}】${chain.cause} → ${chain.effect} → ${chain.impact}`
+          explain: `【${chain.theme}】${chain.cause} → ${chain.effect} → ${chain.impact}${talk}`
         };
       }
       // 原因と起きることから、業界を当てる
@@ -182,7 +184,7 @@ const questionMakers = [
         question: `「${chain.cause}」→「${chain.effect}」という課題を抱えやすいのは？`,
         choices: fourChoices(ind.name, otherIndustryNames(ind)),
         answer: ind.name,
-        explain: `【${chain.theme}】${ind.name}：${chain.impact}。切り出しの一言：${chain.hook}`
+        explain: `【${chain.theme}】${ind.name}：${chain.cause} → ${chain.effect} → ${chain.impact}${talk}`
       };
     }
   },
