@@ -17,6 +17,7 @@
       <button data-tab="lookup">業種→業界</button>
       <button data-tab="talk">架電トーク</button>
       <button data-tab="quiz">クイズ</button>
+      <button data-tab="dashboard">ダッシュボード</button>
       <button data-tab="terms">用語集</button>
     </nav>
   </header>
@@ -70,8 +71,14 @@
     <!-- クイズ -->
     <section id="quiz" class="panel">
       <h2>クイズ</h2>
-      <div class="quiz-score" id="quizScore"></div>
       <div id="quizBox"></div>
+    </section>
+
+    <!-- ダッシュボード -->
+    <section id="dashboard" class="panel">
+      <h2>ダッシュボード</h2>
+      <p class="hint">回答履歴はこのブラウザに保存されます（別のPCやブラウザとは共有されません）。</p>
+      <div id="dashboardBox"></div>
     </section>
 
     <!-- 用語集 -->
@@ -88,5 +95,7 @@
 
   <script src="data/industries.js"></script>
   <script src="app.js"></script>
+  <script src="quiz.js"></script>
+  <script src="dashboard.js"></script>
 </body>
 </html>

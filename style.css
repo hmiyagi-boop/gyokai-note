@@ -163,7 +163,26 @@ input, select {
   font: inherit; background: var(--accent); color: #fff; border: none; border-radius: 6px;
   padding: 8px 16px; cursor: pointer; margin-top: 12px;
 }
-.quiz-score { color: var(--muted); margin-bottom: 12px; }
+.btn-secondary { background: var(--surface); color: var(--accent); border: 1px solid var(--accent); margin-left: 8px; }
+.quiz-start label { max-width: 260px; margin: 12px 0; }
+.quiz-progress { display: flex; flex-wrap: wrap; align-items: center; gap: 8px; color: var(--muted); font-size: 0.85rem; margin-bottom: 8px; }
+.mark-good { color: var(--good); font-weight: bold; }
+.mark-bad { color: var(--bad); font-weight: bold; }
+.link-btn { background: none; border: none; padding: 0; color: var(--accent); font: inherit; cursor: pointer; text-align: left; }
+.link-btn:hover { text-decoration: underline; }
+.result-item .link-btn { margin-top: 10px; }
+
+/* ダッシュボード */
+.bar-fill { position: absolute; top: 0; bottom: 0; left: 0; background: var(--accent); border-radius: 0 4px 4px 0; }
+.bar-value { font-size: 0.85rem; white-space: nowrap; }
+.bar-value small { color: var(--muted); }
+#dashboard .bar-row { grid-template-columns: 150px 1fr 170px; }
+.columns { display: flex; align-items: flex-end; gap: 2px; height: 140px; border-bottom: 1px solid var(--border); padding-bottom: 18px; position: relative; }
+.column { flex: 1; max-width: 36px; height: 100%; display: flex; flex-direction: column; justify-content: flex-end; position: relative; }
+.column-fill { background: var(--accent); border-radius: 4px 4px 0 0; }
+.column:hover .column-fill { opacity: 0.75; }
+.column-label { position: absolute; bottom: -18px; left: 0; right: 0; text-align: center; font-size: 0.7rem; color: var(--muted); }
+.columns-axis { display: flex; justify-content: space-between; font-size: 0.75rem; color: var(--muted); margin-top: 8px; }
 
 .site-footer { text-align: center; color: var(--muted); font-size: 0.8rem; padding: 24px 16px; }
 
@@ -172,4 +191,7 @@ input, select {
   .industry-list { flex-direction: row; flex-wrap: wrap; }
   .industry-list .group-label { width: 100%; }
   .bar-row { grid-template-columns: 110px 1fr 60px; }
+  #dashboard .bar-row { grid-template-columns: 1fr 1fr; }
+  #dashboard .bar-row .bar-value { grid-column: 1 / -1; }
+  .btn-secondary { margin-left: 0; }
 }
