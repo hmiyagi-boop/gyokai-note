@@ -1,0 +1,12 @@
+{
+  "name": "業界理解ノート",
+  "short_name": "業界ノート",
+  "description": "コンサル・営業支援のための業界の一般常識を学ぶアプリ",
+  "start_url": "./",
+  "display": "standalone",
+  "background_color": "#f6f7f9",
+  "theme_color": "#2456c8",
+  "icons": [
+    { "src": "icon.svg", "sizes": "any", "type": "image/svg+xml", "purpose": "any" }
+  ]
+}

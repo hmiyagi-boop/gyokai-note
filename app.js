@@ -54,12 +54,24 @@ function fillIndustrySelect(select) {
 
 // ---------- タブ切り替え ----------
 
+// PCの上部タブ・スマホの下部ナビ・「その他」メニューのどれから押しても同じ画面に切り替わる
+// 「その他」に入っている画面を開いたときは、下部ナビの「その他」を選択状態にする
+const MORE_TABS = ["compare", "ruler", "lookup", "terms", "more"];
+
+function openTab(tab) {
+  document.querySelectorAll(".tabs button").forEach((b) => b.classList.toggle("active", b.dataset.tab === tab));
+  document.querySelectorAll(".bottom-nav button").forEach((b) => {
+    b.classList.toggle("active", b.dataset.tab === tab || (b.dataset.tab === "more" && MORE_TABS.includes(tab)));
+  });
+  document.querySelectorAll(".panel").forEach((p) => p.classList.toggle("active", p.id === tab));
+  document.dispatchEvent(new CustomEvent("tabchange", { detail: tab }));
+  window.scrollTo(0, 0);
+}
+
 function setupTabs() {
-  $("tabs").addEventListener("click", (e) => {
-    const tab = e.target.dataset.tab;
-    if (!tab) return;
-    document.querySelectorAll(".tabs button").forEach((b) => b.classList.toggle("active", b.dataset.tab === tab));
-    document.querySelectorAll(".panel").forEach((p) => p.classList.toggle("active", p.id === tab));
+  document.addEventListener("click", (e) => {
+    const btn = e.target.closest("[data-tab]");
+    if (btn) openTab(btn.dataset.tab);
   });
 }
 
@@ -75,18 +87,43 @@ function renderIndustryList(activeId) {
   `).join("");
 }
 
-function chainHtml(ind) {
-  const c = ind.hiringChain;
+const THEMES = ["売上", "コスト", "人材", "DX・業務"];
+
+function chainHtml(c) {
   return `
     <div class="chain">
-      <div class="step"><div class="label">業界の構造</div>${c.cause}</div>
+      <div class="step"><div class="label">業界の構造（原因）</div>${c.cause}</div>
       <div class="arrow">↓</div>
-      <div class="step"><div class="label">採用への影響</div>${c.hiring}</div>
+      <div class="step"><div class="label">起きること</div>${c.effect}</div>
       <div class="arrow">↓</div>
-      <div class="step"><div class="label">経営への影響</div>${c.management}</div>
+      <div class="step"><div class="label">経営への影響</div>${c.impact}</div>
     </div>
     <div class="hook"><strong>切り出しの一言：</strong>${c.hook}</div>
   `;
+}
+
+// 売上／コスト／人材／DX の切り替え付きで課題の連鎖を表示する
+function themedChainsHtml(ind, prefix) {
+  return `
+    <div class="segmented" data-chain-switch="${prefix}">
+      ${ind.issueChains.map((c, i) => `<button data-chain-index="${i}" class="${i === 0 ? "active" : ""}">${c.theme}</button>`).join("")}
+    </div>
+    <div id="${prefix}-chain">${chainHtml(ind.issueChains[0])}</div>
+  `;
+}
+
+function bindChainSwitch(ind, prefix) {
+  const sw = document.querySelector(`[data-chain-switch="${prefix}"]`);
+  sw.addEventListener("click", (e) => {
+    const btn = e.target.closest("[data-chain-index]");
+    if (!btn) return;
+    sw.querySelectorAll("button").forEach((b) => b.classList.toggle("active", b === btn));
+    $(`${prefix}-chain`).innerHTML = chainHtml(ind.issueChains[Number(btn.dataset.chainIndex)]);
+  });
+}
+
+function listCard(title, items) {
+  return `<div class="card"><h3>${title}</h3><dl class="terms">${items.map((t) => `<dt>${t.name || t.term}</dt><dd>${t.meaning}</dd>`).join("")}</dl></div>`;
 }
 
 function renderIndustryDetail(id) {
@@ -103,19 +140,23 @@ function renderIndustryDetail(id) {
       <div class="stat"><div class="label">労働集約度</div><div class="value" style="font-size:1rem">${ind.laborIntensity}</div></div>
     </div>
 
+    <div class="card"><h3>市場規模</h3><p>${ind.marketSize}</p></div>
     <div class="card"><h3>含まれる業種</h3><div class="chips">${ind.subIndustries.map((s) => `<span class="chip">${s}</span>`).join("")}</div></div>
-    <div class="card"><h3>儲けのしくみ</h3><p>${ind.businessModel}</p><p class="hint">利益率：${ind.margin.note}</p></div>
-    <div class="card"><h3>売上規模の感覚</h3><p>${ind.revenueNote}</p></div>
-    <div class="card"><h3>拠点の特徴</h3><p>${ind.locations.note}</p></div>
+    <div class="card"><h3>儲けのしくみ</h3><p>${ind.businessModel}</p>
+      <p><strong>コスト構造：</strong>${ind.costStructure}</p><p class="hint">利益率：${ind.margin.note}</p></div>
+    <div class="card"><h3>経営課題の仮説（原因 → 影響）</h3>${themedChainsHtml(ind, "zukan")}</div>
     <div class="card"><h3>最近の動きと影響</h3>
       ${ind.trends.map((t) => `<div class="trend"><div class="period">${t.period}</div><strong>${t.title}</strong><div>→ ${t.impact}</div></div>`).join("")}
     </div>
+    ${listCard("経営者が見ているKPI", ind.kpis)}
+    ${listCard("押さえておきたい法律・制度", ind.regulations)}
+    <div class="card"><h3>主な大手企業</h3><div class="chips">${ind.majorPlayers.map((s) => `<span class="chip">${s}</span>`).join("")}</div></div>
+    <div class="card"><h3>売上規模・拠点・季節性</h3>
+      <p>${ind.revenueNote}</p><p>${ind.locations.note}</p><p>${ind.seasonality}</p></div>
     <div class="card"><h3>よくある経営課題</h3><div class="chips">${ind.issues.map((s) => `<span class="chip">${s}</span>`).join("")}</div></div>
-    <div class="card"><h3>採用の文脈での仮説</h3>${chainHtml(ind)}</div>
-    <div class="card"><h3>知っておきたい用語</h3>
-      <dl class="terms">${ind.keyTerms.map((t) => `<dt>${t.term}</dt><dd>${t.meaning}</dd>`).join("")}</dl>
-    </div>
+    ${listCard("知っておきたい用語", ind.keyTerms)}
   `;
+  bindChainSwitch(ind, "zukan");
 }
 
 function setupZukan() {
@@ -246,13 +287,16 @@ function setupLookup() {
 
 function renderTalk() {
   const ind = findIndustry($("talkIndustry").value);
-  const c = ind.hiringChain;
+  const c = ind.issueChains.find((x) => x.theme === $("talkTheme").value) || ind.issueChains[0];
   $("talkResult").innerHTML = `
-    <div class="card"><h3>仮説のつながり</h3>${chainHtml(ind)}</div>
+    <div class="card"><h3>仮説のつながり（${c.theme}）</h3>${chainHtml(c)}</div>
     <div class="card"><h3>トーク例（まとめて言うと）</h3>
-      <p>「${ind.name}の企業様ですと、${c.cause}ケースが多いと伺っています。
-      そのため${c.hiring.split("→")[0].trim()}という声をよく聞きます。
-      結果として、${c.management.split("。")[0]}、というお話も多いのですが、御社ではいかがでしょうか？」</p>
+      <p>「${ind.name}の企業様ですと、${c.cause}というケースが多いと伺っています。
+      その結果、${c.effect}というお声をよく聞きます。
+      ${c.impact.split("。")[0]}、というお話も多いのですが、御社ではいかがでしょうか？」</p>
+    </div>
+    <div class="card"><h3>数字で確認するなら（KPI）</h3>
+      <dl class="terms">${ind.kpis.map((k) => `<dt>${k.name}</dt><dd>${k.meaning}</dd>`).join("")}</dl>
     </div>
     <div class="card"><h3>話の材料になる最近の動き</h3>
       ${ind.trends.map((t) => `<div class="trend"><div class="period">${t.period}</div><strong>${t.title}</strong><div>→ ${t.impact}</div></div>`).join("")}
@@ -265,139 +309,10 @@ function renderTalk() {
 
 function setupTalk() {
   fillIndustrySelect($("talkIndustry"));
+  $("talkTheme").innerHTML = THEMES.map((t) => `<option>${t}</option>`).join("");
   $("talkIndustry").addEventListener("change", renderTalk);
+  $("talkTheme").addEventListener("change", renderTalk);
   renderTalk();
-}
-
-// ---------- クイズ ----------
-
-// 問題を作る関数を並べておき、ランダムに1つ選んで出題する
-const quizMakers = [
-  // 業種 → 業界
-  () => {
-    const ind = pick(INDUSTRIES);
-    const sub = pick(ind.subIndustries);
-    const others = shuffle(INDUSTRIES.filter((i) => i !== ind)).slice(0, 3);
-    return {
-      question: `「${sub}」はどの業界に分類される？`,
-      choices: shuffle([ind, ...others]).map((i) => i.name),
-      answer: ind.name,
-      explain: `${sub} は ${ind.name}。${ind.summary}`
-    };
-  },
-  // 利益率の比較
-  () => {
-    let a, b;
-    do {
-      [a, b] = shuffle(INDUSTRIES).slice(0, 2);
-    } while (Math.abs(marginMid(a) - marginMid(b)) < 3);
-    const high = marginMid(a) > marginMid(b) ? a : b;
-    return {
-      question: `営業利益率が高い傾向にあるのはどっち？`,
-      choices: [a.name, b.name],
-      answer: high.name,
-      explain: `${a.name}：${marginText(a)}、${b.name}：${marginText(b)}。${high.margin.note}`
-    };
-  },
-  // 用語
-  () => {
-    // 「2024年問題」など複数業界にある用語は1つにまとめる
-    const all = INDUSTRIES.flatMap((ind) => ind.keyTerms.map((t) => ({ ...t, ind })));
-    const pool = all.filter((t, i) => all.findIndex((u) => u.term === t.term) === i);
-    const target = pick(pool);
-    const others = shuffle(pool.filter((t) => t.term !== target.term)).slice(0, 3);
-    return {
-      question: `「${target.meaning}」を表す用語は？`,
-      choices: shuffle([target, ...others]).map((t) => t.term),
-      answer: target.term,
-      explain: `${target.term}（${target.ind.name}でよく使う）：${target.meaning}`
-    };
-  },
-  // 拠点数
-  () => {
-    let set;
-    do {
-      set = shuffle(INDUSTRIES).slice(0, 4);
-      var ranks = set.map((i) => LOCATION_RANK[i.locations.level]);
-    } while (ranks.filter((r) => r === Math.max(...ranks)).length !== 1);
-    const top = set[ranks.indexOf(Math.max(...ranks))];
-    return {
-      question: `拠点（店舗・営業所・事業所）が最も多くなりやすいのは？`,
-      choices: set.map((i) => i.name),
-      answer: top.name,
-      explain: set.map((i) => `${i.name}：${i.locations.level}`).join(" ／ ") + `。${top.locations.note}`
-    };
-  },
-  // 売上規模
-  () => {
-    const ind = pick(INDUSTRIES);
-    const revenue = pick([3, 10, 30, 100, 500, 2000]);
-    const idx = scaleIndex(revenue, ind.revenueBands);
-    return {
-      question: `売上${revenue}億円の${ind.name}の会社。業界内の規模感は？`,
-      choices: SCALE_NAMES,
-      answer: SCALE_NAMES[idx],
-      explain: `${ind.name}の目安：小規模＜${ind.revenueBands.small}億円≦中堅＜${ind.revenueBands.mid}億円≦準大手＜${ind.revenueBands.large}億円≦大手。${ind.revenueNote}`
-    };
-  },
-  // 最近の動き
-  () => {
-    const ind = pick(INDUSTRIES);
-    const trend = pick(ind.trends);
-    const keywords = ["2024", "時間外", "最低賃金", "人手不足", "生成AI", "インバウンド", "物価", "高騰", "DX"];
-    const shared = keywords.filter((k) => trend.title.includes(k));
-    const others = shuffle(INDUSTRIES.filter((i) => i !== ind &&
-      !i.trends.some((t) => shared.some((k) => t.title.includes(k))))).slice(0, 3);
-    return {
-      question: `「${trend.title}」の影響を特に受けているのは？`,
-      choices: shuffle([ind, ...others]).map((i) => i.name),
-      answer: ind.name,
-      explain: `${ind.name}：${trend.impact}`
-    };
-  },
-  // 採用 → 経営の因果
-  () => {
-    const ind = pick(INDUSTRIES);
-    const others = shuffle(INDUSTRIES.filter((i) => i !== ind)).slice(0, 3);
-    return {
-      question: `「${ind.hiringChain.cause}」という構造があるのは？`,
-      choices: shuffle([ind, ...others]).map((i) => i.name),
-      answer: ind.name,
-      explain: `${ind.name}：${ind.hiringChain.hiring} → ${ind.hiringChain.management}`
-    };
-  }
-];
-
-const quizState = { correct: 0, total: 0 };
-
-function renderQuiz() {
-  const q = pick(quizMakers)();
-  $("quizScore").textContent = quizState.total ? `正解 ${quizState.correct} / ${quizState.total}問` : "全業界からランダムに出題します。";
-  $("quizBox").innerHTML = `
-    <div class="card">
-      <div class="quiz-q">${q.question}</div>
-      <div class="choices">${q.choices.map((c) => `<button data-choice="${esc(c)}">${c}</button>`).join("")}</div>
-      <div id="quizAfter"></div>
-    </div>
-  `;
-  $("quizBox").querySelector(".choices").addEventListener("click", (e) => {
-    const btn = e.target.closest("button");
-    if (!btn || btn.disabled) return;
-    const ok = btn.dataset.choice === q.answer;
-    quizState.total++;
-    if (ok) quizState.correct++;
-    $("quizBox").querySelectorAll(".choices button").forEach((b) => {
-      b.disabled = true;
-      if (b.dataset.choice === q.answer) b.classList.add("correct");
-    });
-    if (!ok) btn.classList.add("wrong");
-    $("quizScore").textContent = `正解 ${quizState.correct} / ${quizState.total}問`;
-    $("quizAfter").innerHTML = `
-      <div class="explain"><strong>${ok ? "正解！" : "不正解"}</strong> ${q.explain}</div>
-      <button class="btn" id="quizNext">次の問題</button>
-    `;
-    $("quizNext").addEventListener("click", renderQuiz);
-  });
 }
 
 // ---------- 用語集 ----------
@@ -405,14 +320,17 @@ function renderQuiz() {
 function renderTerms() {
   const q = $("termsInput").value.trim().toLowerCase();
   const all = [
-    ...COMMON_TERMS.map((t) => ({ ...t, source: "共通" })),
-    ...INDUSTRIES.flatMap((ind) => ind.keyTerms.map((t) => ({ ...t, source: ind.name })))
+    ...COMMON_TERMS,
+    ...INDUSTRIES.flatMap((ind) => [
+      ...ind.keyTerms.map((t) => ({ ...t, source: ind.name })),
+      ...ind.kpis.map((k) => ({ term: k.name, meaning: k.meaning, source: `${ind.name}・KPI` })),
+      ...ind.regulations.map((r) => ({ term: r.name, meaning: r.meaning, source: `${ind.name}・法律/制度` }))
+    ])
   ];
   const hits = all.filter((t) => !q || t.term.toLowerCase().includes(q) || t.meaning.toLowerCase().includes(q));
-  $("termsResult").innerHTML = `<div class="table-wrap"><table>
-    <thead><tr><th>用語</th><th>意味</th><th>分野</th></tr></thead>
-    <tbody>${hits.map((t) => `<tr><td><strong>${t.term}</strong></td><td>${t.meaning}</td><td>${t.source}</td></tr>`).join("")}</tbody>
-  </table></div>`;
+  $("termsResult").innerHTML = `<p class="hint">${hits.length}件</p>` + hits.map((t) => `
+    <div class="term-item"><div><strong>${t.term}</strong> <span class="chip">${t.source}</span></div><div>${t.meaning}</div></div>
+  `).join("");
 }
 
 function setupTerms() {
@@ -428,5 +346,6 @@ setupCompare();
 setupRuler();
 setupLookup();
 setupTalk();
-renderQuiz();
 setupTerms();
+$("updatedAt").textContent = window.DATA_UPDATED_AT;
+// クイズは quiz.js、ダッシュボードは dashboard.js で起動します

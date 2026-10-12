@@ -2,21 +2,30 @@
 <html lang="ja">
 <head>
   <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
   <title>業界理解ノート</title>
+  <meta name="description" content="コンサル・営業支援のための業界の一般常識を学ぶアプリ">
+  <meta name="theme-color" content="#2456c8">
+  <!-- スマホのホーム画面に追加したときの設定 -->
+  <link rel="manifest" href="manifest.webmanifest">
+  <link rel="icon" href="icon.svg" type="image/svg+xml">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-title" content="業界ノート">
   <link rel="stylesheet" href="style.css">
 </head>
 <body>
   <header class="site-header">
     <h1>業界理解ノート</h1>
     <p class="lead">お客様と同じ目線で話すための、業界の「一般常識」</p>
+    <!-- PC用の上部タブ（スマホでは非表示） -->
     <nav class="tabs" id="tabs">
       <button data-tab="zukan" class="active">業界図鑑</button>
       <button data-tab="compare">業界比較</button>
       <button data-tab="ruler">売上ものさし</button>
       <button data-tab="lookup">業種→業界</button>
-      <button data-tab="talk">架電トーク</button>
+      <button data-tab="talk">仮説トーク</button>
       <button data-tab="quiz">クイズ</button>
+      <button data-tab="dashboard">ダッシュボード</button>
       <button data-tab="terms">用語集</button>
     </nav>
   </header>
@@ -33,7 +42,7 @@
     <!-- 業界比較 -->
     <section id="compare" class="panel">
       <h2>業界比較</h2>
-      <p class="hint">見出しをクリックすると並べ替えられます。利益率はおおよその目安です。</p>
+      <p class="hint">見出しをタップすると並べ替えられます。利益率はおおよその目安です。</p>
       <div id="marginChart" class="bar-chart"></div>
       <div class="table-wrap"><table id="compareTable"></table></div>
     </section>
@@ -43,7 +52,7 @@
       <h2>売上ものさし</h2>
       <p class="hint">「売上○億円」がその業界で大きいのか小さいのかを判定します。</p>
       <div class="form-row">
-        <label>売上高（億円）<input type="number" id="rulerRevenue" value="10" min="0" step="0.1"></label>
+        <label>売上高（億円）<input type="number" id="rulerRevenue" value="10" min="0" step="0.1" inputmode="decimal"></label>
         <label>業界<select id="rulerIndustry"></select></label>
       </div>
       <div id="rulerResult"></div>
@@ -59,19 +68,28 @@
       <div id="lookupResult"></div>
     </section>
 
-    <!-- 架電トーク -->
+    <!-- 仮説トーク -->
     <section id="talk" class="panel">
-      <h2>架電トークの組み立て</h2>
-      <p class="hint">業界の構造 → 採用課題 → 経営への影響、の順に仮説をつなげます。</p>
-      <label>業界<select id="talkIndustry"></select></label>
+      <h2>仮説トーク</h2>
+      <p class="hint">業界の構造 → 起きること → 経営への影響、の順に仮説をつなげます。</p>
+      <div class="form-row">
+        <label>業界<select id="talkIndustry"></select></label>
+        <label>視点<select id="talkTheme"></select></label>
+      </div>
       <div id="talkResult"></div>
     </section>
 
     <!-- クイズ -->
     <section id="quiz" class="panel">
       <h2>クイズ</h2>
-      <div class="quiz-score" id="quizScore"></div>
       <div id="quizBox"></div>
+    </section>
+
+    <!-- ダッシュボード -->
+    <section id="dashboard" class="panel">
+      <h2>成績ダッシュボード</h2>
+      <p class="hint">回答履歴はこの端末のブラウザに保存されます（PCとスマホでは別々に記録されます）。</p>
+      <div id="dashboardBox"></div>
     </section>
 
     <!-- 用語集 -->
@@ -80,13 +98,37 @@
       <input type="search" id="termsInput" placeholder="用語を検索" class="search">
       <div id="termsResult"></div>
     </section>
+
+    <!-- その他（スマホの下部ナビから開くメニュー） -->
+    <section id="more" class="panel">
+      <h2>その他</h2>
+      <div class="more-menu">
+        <button data-tab="compare"><strong>業界比較</strong><span>利益率・拠点数などを業界横断で比較</span></button>
+        <button data-tab="ruler"><strong>売上ものさし</strong><span>売上○億円は業界内で大きい？小さい？</span></button>
+        <button data-tab="lookup"><strong>業種 → 業界</strong><span>業種名から業界を調べる</span></button>
+        <button data-tab="terms"><strong>用語集</strong><span>財務・フレームワーク・業界用語</span></button>
+      </div>
+    </section>
   </main>
 
   <footer class="site-footer">
-    数値は会話用の目安です。商談前には最新の決算資料・統計で確認しましょう。
+    数値は会話用の目安です。商談前には最新の決算資料・統計で確認しましょう。<br>
+    データ更新：<span id="updatedAt"></span>
   </footer>
 
+  <!-- スマホ用の下部ナビ（PCでは非表示） -->
+  <nav class="bottom-nav">
+    <button data-tab="zukan" class="active"><span class="icon">📖</span>図鑑</button>
+    <button data-tab="talk"><span class="icon">💬</span>トーク</button>
+    <button data-tab="quiz"><span class="icon">✏️</span>クイズ</button>
+    <button data-tab="dashboard"><span class="icon">📊</span>成績</button>
+    <button data-tab="more"><span class="icon">☰</span>その他</button>
+  </nav>
+
   <script src="data/industries.js"></script>
+  <script src="data/basics.js"></script>
   <script src="app.js"></script>
+  <script src="quiz.js"></script>
+  <script src="dashboard.js"></script>
 </body>
 </html>
