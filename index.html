@@ -1,0 +1,92 @@
+<!doctype html>
+<html lang="ja">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>業界理解ノート</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <header class="site-header">
+    <h1>業界理解ノート</h1>
+    <p class="lead">お客様と同じ目線で話すための、業界の「一般常識」</p>
+    <nav class="tabs" id="tabs">
+      <button data-tab="zukan" class="active">業界図鑑</button>
+      <button data-tab="compare">業界比較</button>
+      <button data-tab="ruler">売上ものさし</button>
+      <button data-tab="lookup">業種→業界</button>
+      <button data-tab="talk">架電トーク</button>
+      <button data-tab="quiz">クイズ</button>
+      <button data-tab="terms">用語集</button>
+    </nav>
+  </header>
+
+  <main>
+    <!-- 業界図鑑 -->
+    <section id="zukan" class="panel active">
+      <div class="zukan-layout">
+        <aside class="industry-list" id="industryList"></aside>
+        <article class="industry-detail" id="industryDetail"></article>
+      </div>
+    </section>
+
+    <!-- 業界比較 -->
+    <section id="compare" class="panel">
+      <h2>業界比較</h2>
+      <p class="hint">見出しをクリックすると並べ替えられます。利益率はおおよその目安です。</p>
+      <div id="marginChart" class="bar-chart"></div>
+      <div class="table-wrap"><table id="compareTable"></table></div>
+    </section>
+
+    <!-- 売上ものさし -->
+    <section id="ruler" class="panel">
+      <h2>売上ものさし</h2>
+      <p class="hint">「売上○億円」がその業界で大きいのか小さいのかを判定します。</p>
+      <div class="form-row">
+        <label>売上高（億円）<input type="number" id="rulerRevenue" value="10" min="0" step="0.1"></label>
+        <label>業界<select id="rulerIndustry"></select></label>
+      </div>
+      <div id="rulerResult"></div>
+      <h3>全業界で見ると</h3>
+      <div id="rulerAll"></div>
+    </section>
+
+    <!-- 業種→業界 -->
+    <section id="lookup" class="panel">
+      <h2>業種 → 業界</h2>
+      <p class="hint">業種名を入れると、どの業界に分類されるかを調べます（例：SES、調剤薬局、3PL）。</p>
+      <input type="search" id="lookupInput" placeholder="業種名を入力" class="search">
+      <div id="lookupResult"></div>
+    </section>
+
+    <!-- 架電トーク -->
+    <section id="talk" class="panel">
+      <h2>架電トークの組み立て</h2>
+      <p class="hint">業界の構造 → 採用課題 → 経営への影響、の順に仮説をつなげます。</p>
+      <label>業界<select id="talkIndustry"></select></label>
+      <div id="talkResult"></div>
+    </section>
+
+    <!-- クイズ -->
+    <section id="quiz" class="panel">
+      <h2>クイズ</h2>
+      <div class="quiz-score" id="quizScore"></div>
+      <div id="quizBox"></div>
+    </section>
+
+    <!-- 用語集 -->
+    <section id="terms" class="panel">
+      <h2>用語集</h2>
+      <input type="search" id="termsInput" placeholder="用語を検索" class="search">
+      <div id="termsResult"></div>
+    </section>
+  </main>
+
+  <footer class="site-footer">
+    数値は会話用の目安です。商談前には最新の決算資料・統計で確認しましょう。
+  </footer>
+
+  <script src="data/industries.js"></script>
+  <script src="app.js"></script>
+</body>
+</html>
