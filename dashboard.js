@@ -80,10 +80,11 @@ function renderDashboard() {
       <div class="card">
         <h3>次に復習したい業界</h3>
         <p>${weakest.map(([name, s]) => `<strong>${name}</strong>（${percent(s)}%）`).join("、")}</p>
-        <button class="btn" id="dashWeakQuiz">苦手な業界を優先して3問</button>
+        <button class="btn" id="dashWeakQuiz">苦手を優先して3問</button>
       </div>` : ""}
 
     <div class="card"><h3>プレーごとの正答率</h3>${roundColumns(history)}</div>
+    <div class="card"><h3>分野別の正答率</h3><div class="bar-chart">${rateBars(statsBy("category"))}</div></div>
     <div class="card"><h3>問題の種類別の正答率</h3><div class="bar-chart">${rateBars(statsBy("type"))}</div></div>
     <div class="card"><h3>業界別の正答率</h3><p class="hint">業界名をクリックすると図鑑が開きます。</p>
       <div class="bar-chart">${rateBars(byIndustry, { linkToZukan: true })}</div></div>
@@ -107,8 +108,8 @@ function renderDashboard() {
   });
 }
 
-// ダッシュボードのタブを開くたびに最新の履歴で描き直す
-$("tabs").addEventListener("click", (e) => {
-  if (e.target.dataset.tab === "dashboard") renderDashboard();
+// ダッシュボードを開くたびに最新の履歴で描き直す
+document.addEventListener("tabchange", (e) => {
+  if (e.detail === "dashboard") renderDashboard();
 });
 renderDashboard();
