@@ -56,7 +56,7 @@ function fillIndustrySelect(select) {
 
 // PCの上部タブ・スマホの下部ナビ・「その他」メニューのどれから押しても同じ画面に切り替わる
 // 「その他」に入っている画面を開いたときは、下部ナビの「その他」を選択状態にする
-const MORE_TABS = ["compare", "ruler", "lookup", "terms", "more"];
+const MORE_TABS = ["compare", "ruler", "lookup", "terms", "guide", "more"];
 
 function openTab(tab) {
   document.querySelectorAll(".tabs button").forEach((b) => b.classList.toggle("active", b.dataset.tab === tab));
