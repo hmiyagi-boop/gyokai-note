@@ -27,6 +27,7 @@
       <button data-tab="quiz">クイズ</button>
       <button data-tab="dashboard">ダッシュボード</button>
       <button data-tab="terms">用語集</button>
+      <button data-tab="guide">使い方</button>
     </nav>
   </header>
 
@@ -99,10 +100,88 @@
       <div id="termsResult"></div>
     </section>
 
+    <!-- 使い方ガイド -->
+    <section id="guide" class="panel guide">
+      <h2>使い方ガイド</h2>
+      <p>このアプリは、お客様と同じ目線で話せるように、<strong>業界の構造・数字の感覚・経営課題の仮説</strong>を身につけるための学習ノートです。</p>
+
+      <div class="card">
+        <h3>はじめに：スマホのホーム画面に追加する</h3>
+        <p>ホーム画面に追加すると、アプリのようにワンタップで開けます。</p>
+        <ul>
+          <li><strong>iPhone（Safari）</strong>：共有ボタン → 「ホーム画面に追加」</li>
+          <li><strong>Android（Chrome）</strong>：右上の「︙」 → 「ホーム画面に追加」</li>
+        </ul>
+      </div>
+
+      <h3>おすすめの使い方</h3>
+      <div class="card">
+        <h3>毎日5分：クイズで覚える</h3>
+        <ol class="steps">
+          <li><button class="link-btn" data-tab="quiz">クイズ</button>で3問解く</li>
+          <li>結果画面の解説を読む（トーク例もここで確認）</li>
+          <li>間違えた業界は「図鑑で復習する」から図鑑を開く</li>
+        </ol>
+      </div>
+      <div class="card">
+        <h3>架電・リスト作成の前：仮説を立てる</h3>
+        <ol class="steps">
+          <li><button class="link-btn" data-tab="lookup">業種→業界</button>で、相手の業種がどの業界かを確認</li>
+          <li><button class="link-btn" data-tab="zukan">業界図鑑</button>で、儲けのしくみ・最近の動きを読む</li>
+          <li><button class="link-btn" data-tab="talk">仮説トーク</button>で、売上／コスト／人材／DXのどの視点で話すかを選ぶ</li>
+          <li>「数字で確認するなら（KPI）」から、ヒアリングで聞く数字を決める</li>
+        </ol>
+      </div>
+      <div class="card">
+        <h3>商談・提案の前：規模感をつかむ</h3>
+        <ol class="steps">
+          <li><button class="link-btn" data-tab="ruler">売上ものさし</button>に相手の売上を入れ、業界内での規模（小規模〜大手）と想定利益を確認</li>
+          <li><button class="link-btn" data-tab="compare">業界比較</button>で、他業界と比べた利益率の高い・低いを確認</li>
+          <li>分からない言葉は<button class="link-btn" data-tab="terms">用語集</button>で検索</li>
+        </ol>
+      </div>
+      <div class="card">
+        <h3>週1回：苦手をつぶす</h3>
+        <ol class="steps">
+          <li><button class="link-btn" data-tab="dashboard">成績ダッシュボード</button>で「要復習」の業界・問題の種類を確認</li>
+          <li>「苦手を優先して3問」で集中して解く</li>
+        </ol>
+      </div>
+
+      <h3>各画面でできること</h3>
+      <div class="card">
+        <dl class="terms">
+          <dt>業界図鑑</dt><dd>市場規模、儲けのしくみ、コスト構造、利益率、経営課題の仮説、最近の動き、KPI、法律・制度、大手企業、用語</dd>
+          <dt>仮説トーク</dt><dd>業界と視点を選ぶと「原因 → 起きること → 経営への影響」とトーク例を表示</dd>
+          <dt>クイズ</dt><dd>1回3問。出題範囲は「すべて」「苦手を優先」「業界知識だけ」「ビジネス基礎だけ」「計算だけ」から選べる</dd>
+          <dt>成績ダッシュボード</dt><dd>正答率の推移、分野別・種類別・業界別の正答率、次に復習したい業界</dd>
+          <dt>業界比較</dt><dd>利益率・拠点数・売上規模を業界横断で並べ替え</dd>
+          <dt>売上ものさし</dt><dd>売上○億円がその業界で小規模／中堅／準大手／大手のどれかを判定</dd>
+          <dt>業種→業界</dt><dd>「SES」「調剤薬局」などの業種名から業界を検索</dd>
+          <dt>用語集</dt><dd>財務・フレームワーク・業界用語・KPI・法律をまとめて検索</dd>
+        </dl>
+      </div>
+
+      <h3>よくある質問</h3>
+      <div class="card">
+        <dl class="terms">
+          <dt>成績はどこに保存される？</dt>
+          <dd>使っている端末のブラウザの中です。PCとスマホでは別々に記録され、共有されません。ブラウザの履歴・サイトデータを削除すると成績も消えます。</dd>
+          <dt>数字はどこまで正確？</dt>
+          <dd>統計や業界資料をもとにした「会話で使うための目安」です。商談の前には、相手企業の決算資料や最新の統計で確認してください。</dd>
+          <dt>内容はいつ更新される？</dt>
+          <dd>月1回を目安に、ニュースや統計を反映します。最終更新日はページ下部の「データ更新」に表示されます。</dd>
+          <dt>表示が古いままのときは？</dt>
+          <dd>ページを再読み込みしてください。ホーム画面から開いている場合は、一度アプリを閉じて開き直してください。</dd>
+        </dl>
+      </div>
+    </section>
+
     <!-- その他（スマホの下部ナビから開くメニュー） -->
     <section id="more" class="panel">
       <h2>その他</h2>
       <div class="more-menu">
+        <button data-tab="guide"><strong>使い方ガイド</strong><span>おすすめの使い方・各画面の説明・よくある質問</span></button>
         <button data-tab="compare"><strong>業界比較</strong><span>利益率・拠点数などを業界横断で比較</span></button>
         <button data-tab="ruler"><strong>売上ものさし</strong><span>売上○億円は業界内で大きい？小さい？</span></button>
         <button data-tab="lookup"><strong>業種 → 業界</strong><span>業種名から業界を調べる</span></button>
@@ -113,7 +192,7 @@
 
   <footer class="site-footer">
     数値は会話用の目安です。商談前には最新の決算資料・統計で確認しましょう。<br>
-    データ更新：<span id="updatedAt"></span>
+    データ更新：<span id="updatedAt"></span> ／ <button class="link-btn" data-tab="guide">使い方ガイド</button>
   </footer>
 
   <!-- スマホ用の下部ナビ（PCでは非表示） -->
