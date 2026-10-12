@@ -329,7 +329,7 @@ function renderTerms() {
   ];
   const hits = all.filter((t) => !q || t.term.toLowerCase().includes(q) || t.meaning.toLowerCase().includes(q));
   $("termsResult").innerHTML = `<p class="hint">${hits.length}件</p>` + hits.map((t) => `
-    <div class="term-item"><div><strong>${t.term}</strong> <span class="chip">${t.source}</span></div><div>${t.meaning}</div></div>
+    <div class="term-item"><div><strong>${t.term}</strong> <span class="chip">${t.source}</span></div><div>${t.meaning}</div>${t.detail ? `<div class="term-detail">${t.detail}</div>` : ""}</div>
   `).join("");
 }
 
